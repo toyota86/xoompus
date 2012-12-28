@@ -209,7 +209,7 @@ static void tegra_gpio_irq_unmask(unsigned int irq)
 static int tegra_gpio_irq_set_type(unsigned int irq, unsigned int type)
 {
 	int gpio = irq - INT_GPIO_BASE;
-	struct tegra_gpio_bank *bank = get_irq_chip_data(irq);
+	struct tegra_gpio_bank *bank = irq_get_chip_data(irq);
 	int port = GPIO_PORT(gpio);
 	int lvl_type;
 	int val;
@@ -250,9 +250,9 @@ static int tegra_gpio_irq_set_type(unsigned int irq, unsigned int type)
 	spin_unlock_irqrestore(&bank->lvl_lock[port], flags);
 
 	if (type & (IRQ_TYPE_LEVEL_LOW | IRQ_TYPE_LEVEL_HIGH))
-		__set_irq_handler_unlocked(irq, handle_level_irq);
+		__irq_set_handler_locked(irq, handle_level_irq);
 	else if (type & (IRQ_TYPE_EDGE_FALLING | IRQ_TYPE_EDGE_RISING))
-		__set_irq_handler_unlocked(irq, handle_edge_irq);
+		__irq_set_handler_locked(irq, handle_edge_irq);
 
 	return 0;
 }
@@ -263,10 +263,12 @@ static void tegra_gpio_irq_handler(unsigned int irq, struct irq_desc *desc)
 	int port;
 	int pin;
 	int unmasked = 0;
+	struct irq_chip *chip = irq_desc_get_chip(desc);
+	struct irq_data *data = irq_get_irq_data(irq);
 
-	desc->chip->ack(irq);
+	chip->irq_ack(data);
 
-	bank = get_irq_data(irq);
+	bank = irq_get_handler_data(irq);
 
 	for (port = 0; port < 4; port++) {
 		int gpio = tegra_gpio_compose(bank->bank, port, 0);
@@ -274,7 +276,7 @@ static void tegra_gpio_irq_handler(unsigned int irq, struct irq_desc *desc)
 			__raw_readl(GPIO_INT_ENB(gpio));
 		u32 lvl = __raw_readl(GPIO_INT_LVL(gpio));
 
-		for_each_bit(pin, &sta, 8) {
+		for_each_set_bit(pin, &sta, 8) {
 			__raw_writel(1 << pin, GPIO_INT_CLR(gpio));
 
 			/* if gpio is edge triggered, clear condition
@@ -283,7 +285,7 @@ static void tegra_gpio_irq_handler(unsigned int irq, struct irq_desc *desc)
 			 */
 			if (lvl & (0x100 << pin)) {
 				unmasked = 1;
-				desc->chip->unmask(irq);
+				chip->irq_unmask(data);
 			}
 
 			generic_handle_irq(gpio_to_irq(gpio + pin));
@@ -291,7 +293,7 @@ static void tegra_gpio_irq_handler(unsigned int irq, struct irq_desc *desc)
 	}
 
 	if (!unmasked)
-		desc->chip->unmask(irq);
+		chip->irq_unmask(data);
 
 }
 
