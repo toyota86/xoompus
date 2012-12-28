@@ -174,6 +174,8 @@
 #define INT_GPIO_NR			(28 * 8)
 #endif
 
+#define FIQ_START			INT_GIC_BASE
+
 #define NR_IRQS				(INT_GPIO_BASE + INT_GPIO_NR)
 
 #ifdef CONFIG_TEGRA_WATCHDOG_FIQ

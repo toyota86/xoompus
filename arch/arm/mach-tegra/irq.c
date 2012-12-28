@@ -22,9 +22,10 @@
 #include <linux/interrupt.h>
 #include <linux/irq.h>
 #include <linux/io.h>
+#include <linux/syscore_ops.h>
 
+#include <asm/mach/irq.h>
 #include <asm/hardware/gic.h>
-
 #include <mach/iomap.h>
 
 #include "board.h"
@@ -57,23 +58,22 @@ static void (*gic_unmask_irq)(unsigned int irq) = NULL;
 static void __iomem *tegra_ictlr_base = IO_ADDRESS(TEGRA_PRIMARY_ICTLR_BASE);
 #define ictlr_to_virt(ictlr) (tegra_ictlr_base + (ictlr)*0x100)
 
-static void tegra_mask(unsigned int irq)
+static void tegra_mask(struct irq_data *d)
 {
-	void __iomem *addr = ictlr_to_virt(irq_to_ictlr(irq));
-	gic_mask_irq(irq);
-	writel(1<<(irq&31), addr+ICTLR_CPU_IER_CLR);
+	void __iomem *addr = ictlr_to_virt(irq_to_ictlr(d->irq));
+	gic_mask_irq(d->irq);
+	writel(1<<(d->irq&31), addr+ICTLR_CPU_IER_CLR);
 }
 
-static void tegra_unmask(unsigned int irq)
+static void tegra_unmask(struct irq_data *d)
 {
-	void __iomem *addr = ictlr_to_virt(irq_to_ictlr(irq));
-	gic_unmask_irq(irq);
-	writel(1<<(irq&31), addr+ICTLR_CPU_IER_SET);
+	void __iomem *addr = ictlr_to_virt(irq_to_ictlr(d->irq));
+	gic_unmask_irq(d->irq);
+	writel(1<<(d->irq&31), addr+ICTLR_CPU_IER_SET);
 }
 
 #ifdef CONFIG_PM
-
-static int tegra_set_wake(unsigned int irq, unsigned int on)
+static int tegra_set_wake(struct irq_data *d, unsigned int enable)
 {
 	return 0;
 }
@@ -81,45 +81,44 @@ static int tegra_set_wake(unsigned int irq, unsigned int on)
 
 static struct irq_chip tegra_irq = {
 	.name		= "PPI",
-	.mask		= tegra_mask,
-	.unmask		= tegra_unmask,
+	.irq_mask		= tegra_mask,
+	.irq_unmask		= tegra_unmask,
 #ifdef CONFIG_PM
-	.set_wake	= tegra_set_wake,
+	.irq_set_wake	= tegra_set_wake,
 #endif
 };
 
-static void syncpt_thresh_mask(unsigned int irq)
+static void syncpt_thresh_mask(struct irq_data *irq)
 {
 	(void)irq;
 }
 
-static void syncpt_thresh_unmask(unsigned int irq)
+static void syncpt_thresh_unmask(struct irq_data *irq)
 {
 	(void)irq;
 }
 
 static void syncpt_thresh_cascade(unsigned int irq, struct irq_desc *desc)
 {
-	void __iomem *sync_regs = get_irq_desc_data(desc);
-	u32 reg;
+	void __iomem *sync_regs = irq_desc_get_handler_data(desc);
+	unsigned long reg;
 	int id;
+	struct irq_chip *chip = irq_desc_get_chip(desc);
 
-	desc->chip->ack(irq);
+	chained_irq_enter(chip, desc);
 
 	reg = readl(sync_regs + HOST1X_SYNC_SYNCPT_THRESH_CPU0_INT_STATUS);
 
-	while ((id = __fls(reg)) >= 0) {
-		reg ^= BIT(id);
+	for_each_set_bit(id, &reg, 32)
 		generic_handle_irq(id + INT_SYNCPT_THRESH_BASE);
-	}
 
-	desc->chip->unmask(irq);
+	chained_irq_exit(chip, desc);
 }
 
 static struct irq_chip syncpt_thresh_irq = {
 	.name		= "syncpt",
-	.mask		= syncpt_thresh_mask,
-	.unmask		= syncpt_thresh_unmask
+	.irq_mask		= syncpt_thresh_mask,
+	.irq_unmask		= syncpt_thresh_unmask
 };
 
 void __init syncpt_init_irq(void)
@@ -137,14 +136,14 @@ void __init syncpt_init_irq(void)
 		sync_regs + HOST1X_SYNC_SYNCPT_THRESH_CPU0_INT_STATUS);
 
 	for (i = INT_SYNCPT_THRESH_BASE; i < INT_GPIO_BASE; i++) {
-		set_irq_chip(i, &syncpt_thresh_irq);
-		set_irq_chip_data(i, sync_regs);
-		set_irq_handler(i, handle_simple_irq);
+		irq_set_chip(i, &syncpt_thresh_irq);
+		irq_set_chip_data(i, sync_regs);
+		irq_set_handler(i, handle_simple_irq);
 		set_irq_flags(i, IRQF_VALID);
 	}
-	if (set_irq_data(INT_HOST1X_MPCORE_SYNCPT, sync_regs))
+	if (irq_set_handler_data(INT_HOST1X_MPCORE_SYNCPT, sync_regs))
 		BUG();
-	set_irq_chained_handler(INT_HOST1X_MPCORE_SYNCPT,
+	irq_set_chained_handler(INT_HOST1X_MPCORE_SYNCPT,
 				syncpt_thresh_cascade);
 }
 
