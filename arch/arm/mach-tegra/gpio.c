@@ -323,7 +323,7 @@ void tegra_gpio_resume(void)
 
 	for (i=INT_GPIO_BASE; i<(INT_GPIO_BASE+ARCH_NR_GPIOS); i++) {
 		struct irq_desc *desc = irq_to_desc(i);
-		if (!desc || (desc->status & IRQ_WAKEUP)) continue;
+		if (!desc || (desc->status_use_accessors & IRQ_WAKEUP)) continue;
 		enable_irq(i);
 	}
 }
@@ -337,7 +337,7 @@ void tegra_gpio_suspend(void)
 	for (i=INT_GPIO_BASE; i<(INT_GPIO_BASE+ARCH_NR_GPIOS); i++) {
 		struct irq_desc *desc = irq_to_desc(i);
 		if (!desc) continue;
-		if (desc->status & IRQ_WAKEUP) {
+		if (desc->status_use_accessors & IRQ_WAKEUP) {
 			int gpio = i - INT_GPIO_BASE;
 			pr_debug("gpio %d.%d is wakeup\n", gpio/8, gpio&7);
 			continue;
@@ -364,7 +364,7 @@ void tegra_gpio_suspend(void)
 
 static int tegra_gpio_wake_enable(unsigned int irq, unsigned int enable)
 {
-	struct tegra_gpio_bank *bank = get_irq_chip_data(irq);
+	struct tegra_gpio_bank *bank = irq_get_handler_data(irq);
 	return set_irq_wake(bank->irq, enable);
 }
 #endif
