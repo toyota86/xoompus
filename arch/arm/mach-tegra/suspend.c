@@ -31,6 +31,7 @@
 #include <linux/err.h>
 #include <linux/delay.h>
 #include <linux/suspend.h>
+#include <linux/slab.h>
 
 #include <asm/cacheflush.h>
 #include <asm/hardware/gic.h>
