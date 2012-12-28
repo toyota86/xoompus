@@ -173,6 +173,8 @@ enum {
 	IRQD_IRQ_INPROGRESS		= (1 << 18),
 };
 
+#define IRQ_WAKEUP		0x00100000	/* IRQ triggers system wakeup */
+
 static inline bool irqd_is_setaffinity_pending(struct irq_data *d)
 {
 	return d->state_use_accessors & IRQD_SETAFFINITY_PENDING;
