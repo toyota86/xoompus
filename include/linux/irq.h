@@ -173,7 +173,13 @@ enum {
 	IRQD_IRQ_INPROGRESS		= (1 << 18),
 };
 
+/* review */
+/* all occurrences of ->status are changed to ->status_use_accessors as
+ * the new irq_desc struct does not have member status. need to review if
+ * this is correct.
+ */
 #define IRQ_WAKEUP		0x00100000	/* IRQ triggers system wakeup */
+#define IRQ_SUSPENDED		0x04000000	/* IRQ has gone through suspend sequence */
 
 static inline bool irqd_is_setaffinity_pending(struct irq_data *d)
 {

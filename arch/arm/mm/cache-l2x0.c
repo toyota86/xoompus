@@ -29,6 +29,7 @@ static void __iomem *l2x0_base;
 static DEFINE_SPINLOCK(l2x0_lock);
 static uint32_t l2x0_way_mask;	/* Bitmask of active ways */
 static uint32_t l2x0_size;
+static bool l2x0_disabled = 0;
 
 static inline void cache_wait_way(void __iomem *reg, unsigned long mask)
 {
@@ -276,6 +277,70 @@ void l2x0_enable(void)
 	spin_unlock_irqrestore(&l2x0_lock, flags);
 }
 
+static void olympus_l2x0_enable(__u32 aux_val, __u32 aux_mask)
+{
+	u32 aux;
+
+	if (l2x0_disabled)
+		return;
+
+	/*
+	 * Check if l2x0 controller is already enabled.
+	 * If you are booting from non-secure mode
+	 * accessing the below registers will fault.
+	 */
+	if (!(readl_relaxed(l2x0_base + L2X0_CTRL) & 1)) {
+
+		/* l2x0 controller is disabled */
+
+		aux = readl_relaxed(l2x0_base + L2X0_AUX_CTRL);
+		aux &= aux_mask;
+		aux |= aux_val;
+		writel_relaxed(aux, l2x0_base + L2X0_AUX_CTRL);
+
+		l2x0_inv_all();
+
+		/* enable L2X0 */
+		writel_relaxed(1, l2x0_base + L2X0_CTRL);
+	}
+}
+
+static void l2x0_restart(void)
+{
+	olympus_l2x0_enable(0, ~0ul);
+}
+
+static void l2x0_shutdown(void)
+{
+	unsigned long flags;
+
+	if (l2x0_disabled)
+		return;
+
+	BUG_ON(num_online_cpus() > 1);
+
+	local_irq_save(flags);
+
+	if (readl_relaxed(l2x0_base + L2X0_CTRL) & 1) {
+		int m;
+		/* lockdown all ways, all masters to prevent new line
+		 * allocation during maintenance */
+		for (m=0; m<8; m++) {
+			writel_relaxed(0xffff, l2x0_base + L2X0_LOCKDOWN_WAY_D + (m*8));
+			writel_relaxed(0xffff, l2x0_base + L2X0_LOCKDOWN_WAY_I + (m*8));
+		}
+		l2x0_flush_all();
+		writel_relaxed(0, l2x0_base + L2X0_CTRL);
+		/* unlock cache ways */
+		for (m=0; m<8; m++) {
+			writel_relaxed(0, l2x0_base + L2X0_LOCKDOWN_WAY_D + (m*8));
+			writel_relaxed(0, l2x0_base + L2X0_LOCKDOWN_WAY_I + (m*8));
+		}
+	}
+
+	local_irq_restore(flags);
+}
+
 static void l2x0_disable(void)
 {
 	unsigned long flags;
@@ -284,6 +349,7 @@ static void l2x0_disable(void)
 	__l2x0_clean_all();
 	writel_relaxed(0, l2x0_base + L2X0_CTRL);
 	spin_unlock_irqrestore(&l2x0_lock, flags);
+	l2x0_disabled = 1;
 }
 
 static u32 l2x0_saved_context[4];
@@ -377,6 +443,8 @@ void l2x0_init(void __iomem *base, __u32 aux_val, __u32 aux_mask)
 	outer_cache.inv_all = l2x0_inv_all;
 	outer_cache.disable = l2x0_disable;
 	outer_cache.set_debug = l2x0_set_debug;
+	outer_cache.shutdown = l2x0_shutdown;
+	outer_cache.restart = l2x0_restart;
 
 	pr_info_once("%s cache controller enabled\n", type);
 	pr_info_once("l2x0: %d ways, CACHE_ID 0x%08x, AUX_CTRL 0x%08x, Cache size: %d B\n",

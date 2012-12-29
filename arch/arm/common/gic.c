@@ -409,7 +409,7 @@ static void gic_dist_save(unsigned int gic_nr)
  * handled normally, but any edge interrupts that occured will not be seen by
  * the GIC and need to be handled by the platform-specific wakeup source.
  */
-static void gic_dist_restore(unsigned int gic_nr)
+void gic_dist_restore(unsigned int gic_nr)
 {
 	unsigned int gic_irqs;
 	unsigned int i;
@@ -585,6 +585,22 @@ void __cpuinit gic_enable_ppi(unsigned int irq)
 	irq_set_status_flags(irq, IRQ_NOPROBE);
 	gic_unmask_irq(irq_get_irq_data(irq));
 	local_irq_restore(flags);
+}
+
+void gic_dist_exit(unsigned int gic_nr)
+{
+	if (gic_nr >= MAX_GIC_NR)
+		BUG();
+
+	writel(0, gic_data[gic_nr].dist_base + GIC_DIST_CTRL);
+}
+
+void gic_cpu_exit(unsigned int gic_nr)
+{
+	if (gic_nr >= MAX_GIC_NR)
+		BUG();
+
+	writel(0, gic_data[gic_nr].cpu_base + GIC_CPU_CTRL);
 }
 
 #ifdef CONFIG_SMP

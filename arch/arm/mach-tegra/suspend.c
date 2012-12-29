@@ -315,8 +315,8 @@ static noinline void restore_cpu_complex(bool wait_plls)
 	writel(tegra_sctx.twd_ctrl, twd_base + 0x8);
 	writel(tegra_sctx.twd_load, twd_base + 0);
 
-	gic_dist_restore(0);
-	get_irq_chip(IRQ_LOCALTIMER)->unmask(IRQ_LOCALTIMER);
+	/* review */ gic_dist_restore(0);
+	/* review */ irq_get_chip(IRQ_LOCALTIMER)->irq_unmask(irq_get_irq_data(IRQ_LOCALTIMER));
 
 	if(tegra_nvrm_lp2_persist())
 		enable_irq(INT_SYS_STATS_MON);
@@ -767,9 +767,9 @@ static int tegra_suspend_enter(suspend_state_t state)
 	}
 
 	for_each_irq_desc(irq, desc) {
-		if ((desc->status & IRQ_WAKEUP) &&
-		    (desc->status & IRQ_SUSPENDED)) {
-			get_irq_chip(irq)->unmask(irq);
+		if ((desc->status_use_accessors & IRQ_WAKEUP) &&
+		    (desc->status_use_accessors & IRQ_SUSPENDED)) {
+			irq_get_chip(irq)->irq_unmask(irq_get_irq_data(irq));
 		}
 	}
 
@@ -781,9 +781,9 @@ static int tegra_suspend_enter(suspend_state_t state)
 		tegra_suspend_dram(pdata->core_off);
 
 	for_each_irq_desc(irq, desc) {
-		if ((desc->status & IRQ_WAKEUP) &&
-		    (desc->status & IRQ_SUSPENDED)) {
-			get_irq_chip(irq)->mask(irq);
+		if ((desc->status_use_accessors & IRQ_WAKEUP) &&
+		    (desc->status_use_accessors & IRQ_SUSPENDED)) {
+			irq_get_chip(irq)->irq_unmask(irq_get_irq_data(irq));
 		}
 	}
 

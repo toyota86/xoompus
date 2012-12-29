@@ -100,7 +100,7 @@ static void tegra_timer_set_mode(enum clock_event_mode mode,
 	}
 }
 
-static void tegra_clocksource_resume(void)
+static void tegra_clocksource_resume(struct clocksource *cs)
 {
 	u32 usec;
 
@@ -213,7 +213,7 @@ static void __init tegra_init_timer(void)
 	rate = measure_input_freq(&m, &n);
 	timer_writel(((m-1)<<8 | (n-1)), TIMERUS_USEC_CFG);
 
-	tegra_clocksource_resume();
+	tegra_clocksource_resume(NULL);
 
 	if (clocksource_register(&tegra_clocksource)) {
 		printk(KERN_ERR "Failed to register clocksource\n");
