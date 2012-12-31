@@ -268,7 +268,7 @@ MACHINE_START(HARMONY, "NVIDIA Harmony Development System")
 MACHINE_END
 
 
-MACHINE_START(TEGRA_GENERIC, "Tegra 2 Development System")
+MACHINE_START(LEGACY, "Tegra 2 Development System")
 	.boot_params  = 0x00000100,
 	.phys_io        = IO_APB_PHYS,
 	.io_pg_offst    = ((IO_APB_VIRT) >> 18) & 0xfffc,
