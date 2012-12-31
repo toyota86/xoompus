@@ -143,6 +143,64 @@ struct tag_memclk {
 	__u32 fmemclk;
 };
 
+#define ATAG_NVIDIA_TEGRA 0x41000801
+
+struct tag_nvidia_tegra {
+	__u32 bootarg_key;
+	__u32 bootarg_len;
+	char bootarg[1];
+};
+
+#if defined(CONFIG_MACH_MOT)
+#define ATAG_MOTOROLA 0x41000810
+
+#pragma pack(1)
+struct tag_motorola {
+	__u32 panel_size;
+	__u32 allow_fb_open;
+/*
+	__u32 at_emmc_cid[4];
+	__u32 at_emmc_csd[4];
+	__u32 at_emmc_ext_csd[128];
+*/
+	__u16 at_lpddr2_mr[12];
+	__u8 in_factory;
+	__u8 bl_ver_major;
+	__u8 bl_ver_minor;
+	__u8 uboot_ver_major;
+	__u8 uboot_ver_minor;
+	__u8 cid_suspend_boot;
+};
+#pragma pack()
+
+#define ATAG_WLAN_MAC 0x57464d41
+#define ATAG_WLAN_MAC_LEN 6
+struct tag_wlan_mac {
+	__u8 addr[ATAG_WLAN_MAC_LEN];
+};
+#endif
+
+#define ATAG_BLDEBUG 0x41000811
+struct tag_bldebug {
+	__u16 ints1;
+	__u16 int2;
+	__u16 ints2;
+	__u16 int3;
+	__u16 pc2;
+	__u16 mema;
+	__u8  accy;
+	__u8  uboot;
+};
+
+#if defined(CONFIG_BOOTINFO)
+/* Powerup Reason */
+#define ATAG_POWERUP_REASON 0xf1000401
+
+struct tag_powerup_reason {
+	u32 powerup_reason;
+};
+#endif
+
 struct tag {
 	struct tag_header hdr;
 	union {
@@ -165,6 +223,23 @@ struct tag {
 		 * DC21285 specific
 		 */
 		struct tag_memclk	memclk;
+
+		/*
+		 * Nvidia Tegra specific
+		 */
+		struct tag_nvidia_tegra	tegra;
+
+		/*
+		 * Motorola specific
+		 */
+#if defined(CONFIG_MACH_MOT)
+		struct tag_motorola	motorola;
+		struct tag_wlan_mac	wlan_mac;
+		struct tag_bldebug	bldebug;
+#endif
+#if defined(CONFIG_BOOTINFO)
+		struct tag_powerup_reason powerup_reason;
+#endif /* CONFIG_BOOTINFO */
 	} u;
 };
 
@@ -192,11 +267,16 @@ static struct tagtable __tagtable_##fn __tag = { tag, fn }
 /*
  * Memory map description
  */
-#define NR_BANKS 8
+#ifdef CONFIG_ARCH_LH7A40X
+# define NR_BANKS 16
+#else
+# define NR_BANKS 8
+#endif
 
 struct membank {
 	phys_addr_t start;
 	unsigned long size;
+	unsigned short node;
 	unsigned int highmem;
 };
 
@@ -210,12 +290,28 @@ extern struct meminfo meminfo;
 #define for_each_bank(iter,mi)				\
 	for (iter = 0; iter < (mi)->nr_banks; iter++)
 
+#define for_each_nodebank(iter,mi,no)			\
+	for (iter = 0; iter < (mi)->nr_banks; iter++)	\
+		if ((mi)->bank[iter].node == no)
+
 #define bank_pfn_start(bank)	__phys_to_pfn((bank)->start)
 #define bank_pfn_end(bank)	__phys_to_pfn((bank)->start + (bank)->size)
 #define bank_pfn_size(bank)	((bank)->size >> PAGE_SHIFT)
 #define bank_phys_start(bank)	(bank)->start
 #define bank_phys_end(bank)	((bank)->start + (bank)->size)
 #define bank_phys_size(bank)	(bank)->size
+
+/*
+ * Early command line parameters.
+ */
+struct early_params {
+	const char *arg;
+	void (*fn)(char **p);
+};
+
+#define __early_param(name,fn)					\
+static struct early_params __early_##fn __used			\
+__attribute__((__section__(".early_param.init"))) = { name, fn }
 
 #endif  /*  __KERNEL__  */
 

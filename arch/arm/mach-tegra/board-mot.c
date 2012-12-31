@@ -833,7 +833,7 @@ static void __init mot_fixup(struct machine_desc *desc, struct tag *tags,
 	 *	Dump memory nodes
      */
 	for (i=0; i<mi->nr_banks; i++) {
-	    printk("%s: bank[%d]=%lx@%lx\n", __func__, i, mi->bank[i].size, mi->bank[i].start);
+	    printk("%s: bank[%d]=%lx@%x\n", __func__, i, mi->bank[i].size, mi->bank[i].start);
 	}
 }
 
