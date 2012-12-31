@@ -40,6 +40,9 @@ struct machine_desc {
 #ifdef CONFIG_MULTI_IRQ_HANDLER
 	void			(*handle_irq)(struct pt_regs *);
 #endif
+	unsigned int		phys_io;	/* start of physical io	*/
+	unsigned int		io_pg_offst;	/* byte offset for io
+							 * page tabe entry	*/
 };
 
 /*

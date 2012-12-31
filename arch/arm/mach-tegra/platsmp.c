@@ -23,6 +23,7 @@
 #include <linux/completion.h>
 #include <linux/sched.h>
 #include <linux/cpu.h>
+#include <linux/slab.h>
 
 #include <asm/cacheflush.h>
 #include <mach/hardware.h>
@@ -80,7 +81,8 @@ void __cpuinit platform_secondary_init(unsigned int cpu)
 #endif
 
 	trace_hardirqs_off();
-	gic_cpu_init(0, IO_ADDRESS(TEGRA_ARM_PERIF_BASE) + 0x100);
+	/*gic_cpu_init(0, IO_ADDRESS(TEGRA_ARM_PERIF_BASE) + 0x100);*/
+	gic_secondary_init(0);
 	/*
 	 * Synchronise with the boot thread.
 	 */

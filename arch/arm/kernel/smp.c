@@ -262,7 +262,7 @@ void __ref cpu_die(void)
  * Called by both boot and secondaries to move global data into
  * per-processor storage.
  */
-static void __cpuinit smp_store_cpu_info(unsigned int cpuid)
+void __cpuinit smp_store_cpu_info(unsigned int cpuid)
 {
 	struct cpuinfo_arm *cpu_info = &per_cpu(cpu_data, cpuid);
 

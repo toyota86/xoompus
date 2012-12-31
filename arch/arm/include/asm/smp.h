@@ -45,6 +45,10 @@ asmlinkage void do_IPI(int ipinr, struct pt_regs *regs);
  */
 extern void smp_init_cpus(void);
 
+/*
+ * Move global data into per-processor storage.
+ */
+extern void smp_store_cpu_info(unsigned int cpuid);
 
 /*
  * Raise an IPI cross call on CPUs in callmap.
