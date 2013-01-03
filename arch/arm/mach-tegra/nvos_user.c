@@ -30,6 +30,8 @@
 #include <linux/spinlock.h>
 #include <linux/uaccess.h>
 #include <linux/rwsem.h>
+#include <linux/sched.h>
+#include <linux/smp_lock.h>
 #include <mach/irqs.h>
 #include "nvos.h"
 #include "nvos_ioctl.h"

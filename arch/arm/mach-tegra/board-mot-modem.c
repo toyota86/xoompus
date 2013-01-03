@@ -354,7 +354,7 @@ static void __init mot_setup_wrigley_host_wake(void)
 	printk(KERN_INFO "%s: irq: %d, value: %d\n", __func__, irq,
 				gpio_get_value(WRIGLEY_HOST_WAKE_GPIO));
 
-	set_irq_type(irq, IRQ_TYPE_EDGE_FALLING);
+	irq_set_irq_type(irq, IRQ_TYPE_EDGE_FALLING);
 	err = request_irq(irq, wrigley_host_wake_irq_handler,
 			IRQF_DISABLED, "wan_wake_host", NULL);
 	if (err < 0) {
