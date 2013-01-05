@@ -31,6 +31,7 @@
 #include <linux/gpio.h>
 #include <linux/console.h>
 #include <linux/reboot.h>
+#include <linux/slab.h>
 
 #include <mach/iomap.h>
 #include <mach/io.h>
