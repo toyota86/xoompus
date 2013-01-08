@@ -357,7 +357,7 @@ static void spi_tty_handle_mrdy(void *context)
 	queue_work(spi_tty->work_queue, &spi_tty->write_work);
 }
 
-static int spi_tty_tiocmset(struct tty_struct *tty, struct file *file,
+static int spi_tty_tiocmset(struct tty_struct *tty,
                          unsigned int set, unsigned int clear)
 {
 	unsigned long flags;
@@ -445,12 +445,12 @@ static void spi_tty_set_termios(struct tty_struct *tty, struct ktermios *old_ter
 {
 }
 
-static int spi_tty_tiocmget(struct tty_struct *tty, struct file *file)
+static int spi_tty_tiocmget(struct tty_struct *tty)
 {
 	return 0;
 }
 
-static int spi_tty_ioctl(struct tty_struct *tty, struct file *file,
+static int spi_tty_ioctl(struct tty_struct *tty,
                       unsigned int cmd, unsigned long arg)
 {
 	return -ENOIOCTLCMD;

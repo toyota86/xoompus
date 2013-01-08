@@ -54,7 +54,7 @@ static irqreturn_t mdm6600_spi_mrdy_irq_handler(int irq, void *dev_id)
 	// If use low level trigger, we will get many irq, so here we
 	// toggle trigger level in irq so that we will only get one time triggered
 	trigger_level = (value == 0?IRQF_TRIGGER_HIGH:IRQF_TRIGGER_LOW);
-	set_irq_type(spi->mrdy_irq, trigger_level);
+	irq_set_irq_type(spi->mrdy_irq, trigger_level);
 
 	return IRQ_HANDLED;
 }
