@@ -43,7 +43,7 @@ struct tegra_i2c_bus {
 	struct tegra_i2c_dev *i2c_dev;
 	unsigned int pinmux;
 	unsigned long rate;
-	struct mutex *bus_lock;
+	struct rt_mutex *bus_lock;
 	struct i2c_adapter adapter;
 };
 
@@ -61,10 +61,10 @@ static int tegra_i2c_lock(struct tegra_i2c_bus *i2c_bus)
 		return 0;
 
 	if (in_atomic() || irqs_disabled()) {
-		if (!mutex_trylock(i2c_bus->bus_lock))
+		if (!rt_mutex_trylock(i2c_bus->bus_lock))
 			return -EAGAIN;
 	} else {
-		mutex_lock_nested(i2c_bus->bus_lock, i2c_bus->adapter.level);
+		rt_mutex_lock(i2c_bus->bus_lock);
 	}
 	return 0;
 }
@@ -74,7 +74,7 @@ static void tegra_i2c_unlock(struct tegra_i2c_bus *i2c_bus)
 	if (likely(i2c_bus->bus_lock == &i2c_bus->adapter.bus_lock))
 		return;
 
-	mutex_unlock(i2c_bus->bus_lock);
+	rt_mutex_unlock(i2c_bus->bus_lock);
 }
 
 #define kzalloc_stack(num, buff)					\

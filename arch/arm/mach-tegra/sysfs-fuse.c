@@ -69,10 +69,10 @@ typedef enum
 } TegraFuseSizeInBytes;
 
 
-static ssize_t nvfuse_raw_read(struct kobject *kobj,
+static ssize_t nvfuse_raw_read(struct file *, struct kobject *kobj,
     struct bin_attribute *attr, char *buf, loff_t off, size_t count);
 
-static int nvfuse_raw_mmap(struct kobject *kobj,
+static int nvfuse_raw_mmap(struct file *, struct kobject *kobj,
     struct bin_attribute *attr, struct vm_area_struct *vma);
 
 static ssize_t sysfsfuse_show(struct kobject *kobj,
@@ -130,13 +130,13 @@ static struct kobj_attribute nvfuse_SecBootDeviceSelectRaw_attr =
 static struct kobj_attribute nvfuse_ReservedOdm_attr =
     __ATTR(ReservedOdm, 0440, sysfsfuse_show, sysfsfuse_store);
 
-static ssize_t nvfuse_raw_read(struct kobject *kobj, struct bin_attribute *attr, char *buf, loff_t off, size_t count)
+static ssize_t nvfuse_raw_read(struct file *f, struct kobject *kobj, struct bin_attribute *attr, char *buf, loff_t off, size_t count)
 {
     memcpy(buf, attr->private + off, count);
     return count;
 }
 
-static int nvfuse_raw_mmap(struct kobject *kobj, struct bin_attribute *attr, struct vm_area_struct *vma)
+static int nvfuse_raw_mmap(struct file *f, struct kobject *kobj, struct bin_attribute *attr, struct vm_area_struct *vma)
 {
     if(remap_pfn_range(vma, vma->vm_start, virt_to_phys(attr->private) >> PAGE_SHIFT, attr->size, vma->vm_page_prot)) {
         printk(KERN_ERR "nvfuse_raw_mmap failed\n");

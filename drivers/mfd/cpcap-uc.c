@@ -79,7 +79,7 @@ struct cpcap_uc_data {
 static struct cpcap_uc_data *cpcap_uc_info;
 
 static int fops_open(struct inode *inode, struct file *file);
-static int fops_ioctl(struct inode *inode, struct file *file,
+static long fops_ioctl(struct file *file,
 		      unsigned int cmd, unsigned long arg);
 static ssize_t fops_write(struct file *file, const char *buf,
 			  size_t count, loff_t *ppos);
@@ -550,7 +550,7 @@ err:
 	return retval;
 }
 
-static int fops_ioctl(struct inode *inode, struct file *file,
+static long fops_ioctl(struct file *file,
 		      unsigned int cmd, unsigned long arg)
 {
 	int retval = -ENOTTY;
