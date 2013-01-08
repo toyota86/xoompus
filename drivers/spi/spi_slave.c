@@ -105,6 +105,7 @@ static int spi_slave_resume(struct device *dev)
 #define spi_slave_resume	NULL
 #endif
 
+#warning olympus port: do we need to be consistent with spi.c (spi master) and implement pm functions and get rid of suspend and resume?
 struct bus_type spi_slave_bus_type = {
 	.name		= "spi_s",
 	.dev_attrs	= spi_slave_dev_attrs,
