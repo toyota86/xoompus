@@ -3083,8 +3083,8 @@ static int _nvmap_do_cache_maint(struct nvmap_handle *h,
 {
 	pgprot_t prot;
 	void *addr = NULL;
-	void (*inner_maint)(phys_addr_t, phys_addr_t);
-	void (*outer_maint)(phys_addr_t, phys_addr_t);
+	void (*inner_maint)(const void*, const void*);
+	void (*outer_maint)(unsigned long, unsigned long);
 	int err = 0;
 
 	if (get) h = _nvmap_handle_get(h);
