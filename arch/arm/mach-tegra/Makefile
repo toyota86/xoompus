@@ -19,6 +19,7 @@ ifeq ($(CONFIG_SMP),y)
 obj-y					+= platsmp.o localtimer.o headsmp.o
 obj-$(CONFIG_ARCH_TEGRA_2x_SOC)		+= headsmp-t2.o
 endif
+obj-$(CONFIG_HOTPLUG_CPU)		+= hotplug.o
 obj-$(CONFIG_ARCH_TEGRA_2x_SOC)		+= tegra2_save.o
 obj-$(CONFIG_ARCH_TEGRA_2x_SOC)		+= fuse-cache.o
 obj-$(CONFIG_MACH_TEGRA_GENERIC)	+= board-generic.o
