@@ -1040,4 +1040,11 @@ config USB_G_WEBCAM
 
 endchoice
 
+config USB_ANDROID_RNDIS
+	boolean "Android gadget RNDIS ethernet function"
+	depends on USB_MOT_ANDROID
+	default n
+	help
+	  Provides RNDIS ethernet function for android gadget driver.
+
 endif # USB_GADGET

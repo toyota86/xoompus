@@ -20,6 +20,7 @@
 #define USB_SC_UFI	0x04		/* Floppy */
 #define USB_SC_8070	0x05		/* Removable media */
 #define USB_SC_SCSI	0x06		/* Transparent */
+#define US_SC_SCSI	USB_SC_SCSI	/* Transparent */
 #define USB_SC_LOCKABLE	0x07		/* Password-protected */
 
 #define USB_SC_ISD200	0xf0		/* ISD200 ATA */
@@ -31,6 +32,7 @@
 #define USB_PR_CBI	0x00		/* Control/Bulk/Interrupt */
 #define USB_PR_CB	0x01		/* Control/Bulk w/o interrupt */
 #define USB_PR_BULK	0x50		/* bulk only */
+#define US_PR_BULK	USB_PR_BULK	/* bulk only */
 #define USB_PR_UAS	0x62		/* USB Attached SCSI */
 
 #define USB_PR_USBAT	0x80		/* SCM-ATAPI bridge */
