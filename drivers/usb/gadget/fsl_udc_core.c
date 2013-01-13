@@ -1194,12 +1194,12 @@ static int fsl_vbus_session(struct usb_gadget *gadget, int is_active)
 			dr_controller_stop(udc);
 			dr_controller_reset(udc);
 			spin_unlock_irqrestore(&udc->lock, flags);
-			fsl_udc_clk_suspend();
+			tegra_udc_clk_suspend();
 			udc->vbus_active = 0;
 			udc->usb_state = USB_STATE_DEFAULT;
 		} else if (!udc->vbus_active && is_active) {
 			spin_unlock_irqrestore(&udc->lock, flags);
-			fsl_udc_clk_resume();
+			tegra_udc_clk_resume();
 			/* setup the controller in the device mode */
 			dr_controller_setup(udc);
 			/* setup EP0 for setup packet */
@@ -2601,7 +2601,7 @@ static int __init fsl_udc_probe(struct platform_device *pdev)
 #endif
 
 	/* Initialize USB clocks */
-	ret = fsl_udc_clk_init(pdev);
+	ret = tegra_udc_clk_init(pdev);
 	if (ret < 0)
 		goto err_iounmap_noclk;
 
@@ -2641,7 +2641,7 @@ static int __init fsl_udc_probe(struct platform_device *pdev)
 	 * leave usbintr reg untouched */
 	dr_controller_setup(udc_controller);
 
-	fsl_udc_clk_finalize(pdev);
+	tegra_udc_clk_finalize(pdev);
 
 	/* Setup gadget structure */
 	udc_controller->gadget.ops = &fsl_gadget_ops;
@@ -2696,7 +2696,7 @@ static int __init fsl_udc_probe(struct platform_device *pdev)
 	if (udc_controller->transceiver) {
 		dr_controller_stop(udc_controller);
 		dr_controller_reset(udc_controller);
-		fsl_udc_clk_suspend();
+		tegra_udc_clk_suspend();
 		udc_controller->vbus_active = 0;
 		udc_controller->usb_state = USB_STATE_DEFAULT;
 		otg_set_peripheral(udc_controller->transceiver, &udc_controller->gadget);
@@ -2705,7 +2705,7 @@ static int __init fsl_udc_probe(struct platform_device *pdev)
 #ifdef CONFIG_ARCH_TEGRA
 	/* Power down the phy if cable is not connected */
 	if (!(fsl_readl(&usb_sys_regs->vbus_wakeup) & USB_SYS_VBUS_STATUS))
-		fsl_udc_clk_suspend();
+		tegra_udc_clk_suspend();
 #endif
 #endif
 
@@ -2716,7 +2716,7 @@ err_unregister:
 err_free_irq:
 	free_irq(udc_controller->irq, udc_controller);
 err_iounmap:
-	fsl_udc_clk_release();
+	tegra_udc_clk_release();
 err_iounmap_noclk:
 	iounmap(dr_regs);
 err_release_mem_region:
@@ -2743,7 +2743,7 @@ static int __exit fsl_udc_remove(struct platform_device *pdev)
 	if (udc_controller->transceiver)
 		otg_set_peripheral(udc_controller->transceiver, NULL);
 
-	fsl_udc_clk_release();
+	tegra_udc_clk_release();
 
 	/* DR has been stopped in usb_gadget_unregister_driver() */
 	remove_proc_file();

@@ -167,6 +167,31 @@ int usb_function_deactivate(struct usb_function *function)
 	return status;
 }
 
+void usb_function_set_enabled(struct usb_function *f, int enabled)
+{
+	f->hidden = !enabled;
+	/* kobject_uevent(&f->dev->kobj, KOBJ_CHANGE); */ /* review: do we need this? */
+}
+
+void usb_composite_force_reset(struct usb_composite_dev *cdev)
+{
+	unsigned long                   flags;
+
+	spin_lock_irqsave(&cdev->lock, flags);
+	/* force reenumeration */
+	if (cdev && cdev->gadget) {
+		/* avoid sending a disconnect switch event until after we disconnect */
+		/* cdev->mute_switch = 1; */ /* review: stingray's structure has no mute_switch member */
+		spin_unlock_irqrestore(&cdev->lock, flags);
+
+		usb_gadget_disconnect(cdev->gadget);
+		msleep(10);
+		usb_gadget_connect(cdev->gadget);
+	} else {
+		spin_unlock_irqrestore(&cdev->lock, flags);
+	}
+}
+
 /**
  * usb_function_activate - allow function and gadget enumeration
  * @function: function on which usb_function_activate() was called

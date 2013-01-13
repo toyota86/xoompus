@@ -11,7 +11,8 @@
 #include <linux/platform_device.h>
 #include <linux/err.h>
 #include <linux/io.h>
-#include <mach/usb_phy.h>
+#include <linux/clk.h>
+//#include <mach/usb_phy.h>
 
 static struct tegra_usb_phy *phy;
 static struct clk *udc_clk;

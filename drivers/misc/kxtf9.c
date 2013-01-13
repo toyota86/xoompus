@@ -445,7 +445,7 @@ static void kxtf9_irq_work_func(struct work_struct *work)
 				"int source read error: %d\n", err);
 			goto release;
 		}
-		printk_irq ("%s: status=0x%x\n", __func__, status);
+		printk_irq ("%s: statuz=0x%x\n", __func__, status);
 		int_status = status << 24;
 		if ((status & TPS) > 0) {
 			buf[0] = TILT_POS_CUR;

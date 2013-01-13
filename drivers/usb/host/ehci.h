@@ -108,6 +108,13 @@ struct ehci_hcd {			/* one per controller */
 	unsigned long		suspended_ports;	/* which ports are
 			suspended */
 
+#ifdef CONFIG_USB_OTG_UTILS
+	/*
+	 * Transceiver decleration for OTG support;
+	 */
+	struct otg_transceiver	*transceiver;
+#endif
+
 	/* per-HC memory pools (could be per-bus, but ...) */
 	struct dma_pool		*qh_pool;	/* qh per active urb */
 	struct dma_pool		*qtd_pool;	/* one or more per qh */
@@ -135,6 +142,10 @@ struct ehci_hcd {			/* one per controller */
 	unsigned		amd_pll_fix:1;
 	unsigned		fs_i_thresh:1;	/* Intel iso scheduling */
 	unsigned		use_dummy_qh:1;	/* AMD Frame List table quirk*/
+	unsigned		controller_resets_phy:1;
+	unsigned		host_reinited:1; /* tegra */
+	unsigned		host_resumed:1; /* tegra */
+	struct work_struct	irq_work; /* tegra irq work for power control*/
 
 	/* required for usb32 quirk */
 	#define OHCI_CTRL_HCFS          (3 << 6)

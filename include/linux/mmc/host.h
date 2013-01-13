@@ -188,6 +188,7 @@ struct mmc_host {
 
 	/* host specific block data */
 	unsigned int		max_seg_size;	/* see blk_queue_max_segment_size */
+	unsigned short		max_hw_segs;	/* see blk_queue_max_hw_segments */
 	unsigned short		max_segs;	/* see blk_queue_max_segments */
 	unsigned short		unused;
 	unsigned int		max_req_size;	/* maximum number of bytes in one req */
@@ -230,6 +231,8 @@ struct mmc_host {
 	unsigned int		bus_resume_flags;
 #define MMC_BUSRESUME_MANUAL_RESUME	(1 << 0)
 #define MMC_BUSRESUME_NEEDS_RESUME	(1 << 1)
+
+	unsigned int		max_power_class;
 
 	unsigned int		sdio_irqs;
 	struct task_struct	*sdio_irq_thread;

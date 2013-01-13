@@ -593,6 +593,11 @@ void fsl_udc_clk_finalize(struct platform_device *pdev);
 void fsl_udc_clk_release(void);
 void fsl_udc_clk_suspend(void);
 void fsl_udc_clk_resume(void);
+int tegra_udc_clk_init(struct platform_device *pdev);
+void tegra_udc_clk_finalize(struct platform_device *pdev);
+void tegra_udc_clk_release(void);
+void tegra_udc_clk_suspend(void);
+void tegra_udc_clk_resume(void);
 #else
 static inline int fsl_udc_clk_init(struct platform_device *pdev)
 {
