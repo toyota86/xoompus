@@ -3234,7 +3234,7 @@ static void fsg_function_disable(struct usb_function *f)
 	raise_exception(fsg, FSG_STATE_CONFIG_CHANGE);
 }
 
-static int __init fsg_probe(struct platform_device *pdev)
+static int __devinit fsg_probe(struct platform_device *pdev)
 {
 	struct usb_mass_storage_platform_data *pdata = pdev->dev.platform_data;
 	struct fsg_dev *fsg = the_fsg;

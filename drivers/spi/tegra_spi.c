@@ -180,7 +180,7 @@ static void tegra_spi_workerthread(struct work_struct *w)
 	spin_unlock(&spi->lock);
 }
 
-static int __init tegra_spi_probe(struct platform_device *pdev)
+static int __devinit tegra_spi_probe(struct platform_device *pdev)
 {
 	struct spi_master *master;
 	struct tegra_spi *spi;
