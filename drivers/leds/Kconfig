@@ -44,6 +44,12 @@ config LEDS_LM3530
 	  controlled manually or using PWM input or using ambient
 	  light automatically.
 
+config LEDS_LM3532
+	tristate "Support for LM3530 display backlight driver"
+	depends on LEDS_CLASS
+	help
+	  This option enables support for LM3532 display backlight driver
+
 config LEDS_LOCOMO
 	tristate "LED Support for Locomo device"
 	depends on LEDS_CLASS
