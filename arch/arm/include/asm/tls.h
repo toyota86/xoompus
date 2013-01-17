@@ -6,7 +6,12 @@
 	.endm
 
 	.macro set_tls_v6k, tp, tmp1, tmp2
+#if defined(CONFIG_TEGRA_ERRATA_657451)
+	and     r4, r3, #(1<<20)
+	orr     r3, r3, r4, lsr #20
+#else
 	mcr	p15, 0, \tp, c13, c0, 3		@ set TLS register
+#endif /* CONFIG_TEGRA_ERRATA_657451 */
 	.endm
 
 	.macro set_tls_v6, tp, tmp1, tmp2

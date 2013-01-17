@@ -991,14 +991,27 @@ kuser_cmpxchg_fixup:
  *	        : "=r" (__val) : : "lr","cc" ); \
  *	   __val; })
  */
-
+#warning olympus port: review if this function is ported correctly
 __kuser_get_tls:				@ 0xffff0fe0
-	ldr	r0, [pc, #(16 - 8)]	@ read TLS, set in kuser_get_tls_init
-	usr_ret	lr
-	mrc	p15, 0, r0, c13, c0, 3	@ 0xffff0fe8 hardware TLS code
-	.rep	4
-	.word	0			@ 0xffff0ff0 software TLS value, then
-	.endr				@ pad up to __kuser_helper_version
+
+#if 0
+        ldr     r0, [pc, #(16 - 8)]             @ TLS stored at 0xffff0ff0
+#else
+        mrc     p15, 0, r0, c13, c0, 3          @ read TLS register
+#if defined(CONFIG_TEGRA_ERRATA_657451)
+        bfi     r0, r0, #20, #1
+        bic     r0, r0, #1
+#endif
+#endif
+        usr_ret lr
+
+#if defined(CONFIG_TEGRA_ERRATA_657451)
+        .rep    3
+#else
+        .rep    5
+#endif
+        .word   0                       @ pad up to __kuser_helper_version
+        .endr
 
 /*
  * Reference declaration:
