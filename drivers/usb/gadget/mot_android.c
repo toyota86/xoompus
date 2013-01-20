@@ -405,7 +405,7 @@ static void bind_functions(struct android_dev *dev)
 	_are_functions_bound = true;
 }
 
-static int __init android_bind_config(struct usb_configuration *c)
+static int android_bind_config(struct usb_configuration *c)
 {
 	struct android_dev *dev = _android_dev;
 
@@ -623,7 +623,7 @@ static int get_product_id(struct android_dev *dev)
 	return dev->product_id;
 }
 
-static int __init android_bind(struct usb_composite_dev *cdev)
+static int android_bind(struct usb_composite_dev *cdev)
 {
 	struct android_dev *dev = _android_dev;
 	struct usb_gadget *gadget = cdev->gadget;
