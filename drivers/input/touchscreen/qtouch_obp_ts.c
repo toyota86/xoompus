@@ -30,6 +30,7 @@
 #include <linux/mutex.h>
 #include <linux/qtouch_obp_ts.h>
 #include <linux/wakelock.h>
+#include <linux/slab.h>
 #include <asm/io.h>
 #include <asm/uaccess.h>
 
@@ -168,7 +169,7 @@ module_param_named(tsdebug, qtouch_tsdebug, uint, 0664);
 static void qtouch_printk (int, char *, ...);
 
 static	int	qtouch_ioctl_open(struct inode *inode, struct file *filp);
-static	int qtouch_ioctl_ioctl(struct inode *node, struct file *filp, unsigned int cmd, unsigned long arg);
+static	long qtouch_ioctl_ioctl(struct file *filp, unsigned int cmd, unsigned long arg);
 static	int qtouch_ioctl_write(struct file *flip, const char __user *buf, size_t count, loff_t *f_pos );
 static int qtouch_read(struct qtouch_ts_data *ts, void *buf, int buf_sz);
 
@@ -179,7 +180,7 @@ struct	file_operations	qtouch_fops =
 {
 	.owner		= THIS_MODULE,
 	.open		= qtouch_ioctl_open,
-	.ioctl		= qtouch_ioctl_ioctl,
+	.unlocked_ioctl		= qtouch_ioctl_ioctl,
 	.write		= qtouch_ioctl_write,
 };
 
@@ -437,7 +438,7 @@ static struct qtm_object *find_object_rid(struct qtouch_ts_data *ts, int rid)
 {
 	int i;
 
-	for_each_bit(i, ts->obj_map, QTM_OBP_MAX_OBJECT_NUM) {
+	for_each_set_bit(i, ts->obj_map, QTM_OBP_MAX_OBJECT_NUM) {
 		struct qtm_object *obj = &ts->obj_tbl[i];
 
 		if ((rid >= obj->report_id_min) && (rid <= obj->report_id_max))
@@ -2659,7 +2660,7 @@ unsigned char	kernelBuffer[sizeof(struct qtim_ioctl_data)];
  * @return 0 in success, or negative error code
  */
 static	QTM_ALL_OBJECTS qtmAllObjects;
-static int qtouch_ioctl_ioctl(struct inode *node, struct file *filp,
+static long qtouch_ioctl_ioctl(struct file *filp,
 		unsigned int code, unsigned long arg)
 {
 	IOCTL_DATA	*usrData;

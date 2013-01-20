@@ -65,3 +65,4 @@ obj-$(CONFIG_SENSORS_MOTO_BMP085) += moto_bmp085.o
 obj-$(CONFIG_TEGRA_CRYPTO_DEV)	+= tegra-cryptodev.o
 obj-$(CONFIG_TS27010MUX)	+= ts27010mux/
 obj-$(CONFIG_MOT_SEC_DRIVER)	+= sec/
+obj-$(CONFIG_MOT_TCMD_DRIVER)	+= tcmd_driver.o
