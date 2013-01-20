@@ -493,6 +493,18 @@ config UID_STAT
 	bool "UID based statistics tracking exported to /proc/uid_stat"
 	default n
 
+config LBEE9QMB_RFKILL
+	tristate "Bluetooth power control driver for Murata lbee9qmbc"
+	depends on RFKILL
+	default n
+	---help---
+	  Creates an rfkill entry in sysfs for power control of
+	  Murata lbee9qmbc Bluetooth+WiFi chips.
+
+config VIB_GPIO
+	bool "GPIO Vibrator"
+	default n
+
 config VMWARE_BALLOON
 	tristate "VMware Balloon Driver"
 	depends on X86
@@ -589,6 +601,7 @@ source "drivers/misc/c2port/Kconfig"
 source "drivers/misc/eeprom/Kconfig"
 source "drivers/misc/cb710/Kconfig"
 source "drivers/misc/ts27010mux/Kconfig"
+source "drivers/misc/sec/Kconfig"
 source "drivers/misc/spi-tty/Kconfig"
 source "drivers/misc/iwmc3200top/Kconfig"
 source "drivers/misc/ti-st/Kconfig"
