@@ -50,6 +50,7 @@ obj-y				+= lis3lv02d/
 obj-$(CONFIG_LBEE9QMB_RFKILL)	+= lbee9qmb-rfkill.o
 obj-$(CONFIG_WL127X_RFKILL)	+= wl127x-rfkill.o
 obj-$(CONFIG_APANIC)		+= apanic.o
+obj-$(CONFIG_APANIC_MMC)	+= apanic_handle_mmc.o apanic_report_block.o
 obj-$(CONFIG_SENSORS_AK8975)	+= akm8975.o
 obj-$(CONFIG_SENSORS_NCT1008)	+= nct1008.o
 obj-$(CONFIG_SENSORS_KXTF9)	+= kxtf9.o
