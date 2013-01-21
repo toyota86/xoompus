@@ -3,7 +3,7 @@
 
 #include <mach/serial.h>
 #include <linux/i2c.h>
-#include <linux/i2c/akm8975.h>
+#include <linux/akm8975.h>
 #include "hwrev.h"
 
 extern struct kxtf9_platform_data kxtf9_data;
