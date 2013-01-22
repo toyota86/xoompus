@@ -139,6 +139,7 @@ void __init tegra_common_init(void)
 	reg |= 1;
 	asm volatile ("mcr p15, 0, %0, c15, c0, 0" : : "r" (reg) : "cc");
 #endif
+	arm_pm_restart = tegra_machine_restart;
 
 	nvmap_add_carveout_heap(TEGRA_IRAM_BASE, TEGRA_IRAM_SIZE,
 				"iram", NVMEM_HEAP_CARVEOUT_IRAM);
@@ -147,5 +148,4 @@ void __init tegra_common_init(void)
 	tegra_init_fuse_cache();
 	tegra_dma_init();
 	tegra_mc_init();
-	arm_pm_restart = tegra_machine_restart;
 }
