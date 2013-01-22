@@ -160,7 +160,7 @@ int sdhci_simple_host_init(int id)
 
 EXPORT_SYMBOL(sdhci_simple_host_init);
 
-int __init tegra_sdhci_simple_probe(struct platform_device *pdev)
+int __devinit tegra_sdhci_simple_probe(struct platform_device *pdev)
 {
 	struct tegra_sdhci_simple *host;
 	struct tegra_sdhci_simple_platform_data *pdata = pdev->dev.platform_data;

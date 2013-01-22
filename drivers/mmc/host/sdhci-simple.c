@@ -929,7 +929,7 @@ struct sdhci_host *sdhci_simple_alloc_host(int id)
 
 	host->mmc->index = id;
 	host->mmc->max_hw_segs = 1;
-	host->mmc->max_phys_segs = 1;
+	host->mmc->max_segs = 1;
 	host->mmc->max_seg_size = PAGE_CACHE_SIZE;
 	host->mmc->max_req_size = PAGE_CACHE_SIZE;
 	host->mmc->max_blk_size = 512;
@@ -1045,7 +1045,7 @@ int sdhci_simple_add_host(struct sdhci_host *host)
 	spin_lock_init(&host->lock);
 
 	mmc->max_hw_segs = 128;
-	mmc->max_phys_segs = 128;
+	mmc->max_segs = 128;
 	mmc->max_req_size = 524288;
 	mmc->max_seg_size = mmc->max_req_size;
 

@@ -140,4 +140,11 @@ config USB_CPCAP_OTG
 	  cpcap-whisper and emulates the same behavior as when the VBUS
 	  and ID pins are connected to the app processor.
 
+config CPCAP_USB
+	tristate "CPCAP USB Transceiver Driver"
+	select USB_OTG_UTILS
+	help
+	  Enable this to support the USB OTG transceiver on the
+	  Motorola CPCAP PMIC
+
 endif # USB || OTG

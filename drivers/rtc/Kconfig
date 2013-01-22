@@ -134,6 +134,14 @@ config RTC_INTF_CPCAP_SECCLKD
 	  CPCAP RTC driver support for secure clock daemon by maintaining a
 	  counter to keep track of changes in RTC time.
 
+config RTC_INTF_SECCLKD
+	tristate "RTC SECCLKD"
+	default n
+	help
+	  CPCAP RTC driver provide support for secure clock daemon in
+	  gettting the counter maintained to keep track of the change
+	  in RTC time.
+
 config RTC_DRV_TEST
 	tristate "Test driver/device"
 	help
