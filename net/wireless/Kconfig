@@ -1,5 +1,12 @@
 config WIRELESS_EXT
 	bool
+	default y
+	---help---
+	  This option enables the legacy wireless extensions
+	  (wireless network interface configuration via ioctls.)
+
+	  Say Y unless you've upgraded all your userspace to use
+	  nl80211 instead of wireless extensions.
 
 config WEXT_CORE
 	def_bool y
@@ -14,7 +21,7 @@ config WEXT_SPY
 	bool
 
 config WEXT_PRIV
-	bool
+	def_bool y
 
 config CFG80211
 	tristate "cfg80211 - wireless configuration API"
