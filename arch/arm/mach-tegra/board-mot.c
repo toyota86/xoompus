@@ -27,7 +27,6 @@
 #include <linux/spi/cpcap.h>
 #include <linux/spi/spi.h>
 #include <linux/i2c.h>
-#include <linux/delay.h>
 
 #include <asm/bootinfo.h>
 #include <asm/mach-types.h>
@@ -646,7 +645,6 @@ static int config_unused_pins(char *pins, int num)
 
 static void __init tegra_mot_init(void)
 {
-	/* moved to tegra_init_early
 	tegra_common_init();
 	tegra_setup_nvodm(true, true);
 	tegra_register_socdev();
@@ -659,7 +657,6 @@ static void __init tegra_mot_init(void)
 #endif
 
 	mot_setup_power();
-	*/
 	mot_setup_lights(&tegra_i2c_bus0_board_info[BACKLIGHT_DEV]);
 	mot_setup_touch(&tegra_i2c_bus0_board_info[TOUCHSCREEN_DEV]);
 
@@ -840,33 +837,6 @@ static void __init mot_fixup(struct machine_desc *desc, struct tag *tags,
 	}
 }
 
-void __init tegra_init_early(void)
-{
-        /*
-	arm_pm_restart = tegra_pm_restart;
-        tegra_init_fuse();
-        tegra_gpio_resume_init();
-        tegra_init_clock();
-        tegra_init_pinmux();
-        tegra_clk_init_from_table(common_clk_init_table);
-        tegra_init_power();
-        tegra_init_cache();
-	*/
-
-	tegra_common_init();
-        tegra_setup_nvodm(true, true);
-        tegra_register_socdev();
-
-#ifdef CONFIG_APANIC_RAM
-        apanic_ram_init();
-#endif
-#ifdef CONFIG_APANIC_MMC
-        apanic_mmc_init();
-#endif
-
-        mot_setup_power();
-}
-
 MACHINE_START(OLYMPUS, "Olympus")
 
     .boot_params  = 0x00000100,
@@ -874,7 +844,6 @@ MACHINE_START(OLYMPUS, "Olympus")
     .map_io       = tegra_map_common_io,
     .init_irq     = tegra_init_irq,
     .init_machine = tegra_mot_init,
-    .init_early   = tegra_init_early,
     .timer        = &tegra_timer,
 
 MACHINE_END
