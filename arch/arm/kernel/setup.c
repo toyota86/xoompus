@@ -28,7 +28,6 @@
 #include <linux/fs.h>
 #include <linux/proc_fs.h>
 #include <linux/memblock.h>
-#include <linux/reboot.h>
 
 #include <asm/unified.h>
 #include <asm/cpu.h>
@@ -737,7 +736,6 @@ static int __init customize_machine(void)
 	/* customizes platform devices, or adds new ones */
 	if (machine_desc->init_machine)
 		machine_desc->init_machine();
-	machine_restart(NULL);
 	return 0;
 }
 arch_initcall(customize_machine);
